@@ -1,0 +1,13 @@
+node_modules
+frontend/node_modules
+backend/node_modules
+frontend/dist
+backend/dist
+.git
+.gitignore
+.agents
+.codex
+npm-debug.log
+docker-compose.override.yml
+backend/.env
+frontend/.env

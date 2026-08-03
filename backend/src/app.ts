@@ -1,9 +1,15 @@
 import cors from "cors";
-import express from "express";
+import express, { type Router } from "express";
 
 import type { AppConfig } from "./config.js";
+import { sendSuccess } from "./http/api-response.js";
+import { errorHandler, notFoundHandler } from "./http/errors.js";
 
-export function createApp(config: AppConfig) {
+type AppDependencies = {
+  authRouter?: Router;
+};
+
+export function createApp(config: AppConfig, dependencies: AppDependencies = {}) {
   const app = express();
 
   app.use(
@@ -15,12 +21,23 @@ export function createApp(config: AppConfig) {
 
   app.use(express.json());
 
+  if (dependencies.authRouter) {
+    app.use("/api/auth", dependencies.authRouter);
+  }
+
   app.get("/api/health", (_request, response) => {
-    response.status(200).json({
-      status: "ok",
-      message: "Backend is running",
-    });
+    sendSuccess(
+      response,
+      200,
+      {
+        status: "ok",
+      },
+      "Backend is running.",
+    );
   });
+
+  app.use(notFoundHandler);
+  app.use(errorHandler);
 
   return app;
 }
