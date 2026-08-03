@@ -1,0 +1,33 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --font-sans: 'Manrope', 'Segoe UI', sans-serif;
+  --font-heading: 'Manrope', 'Segoe UI', sans-serif;
+
+  --color-primary: #2563eb;
+  --color-primary-strong: #1d4ed8;
+  --color-primary-soft: #dbeafe;
+  --color-ink: #111827;
+  --color-ink-muted: #475569;
+  --color-text-soft: #64748b;
+  --color-surface: #f8fafc;
+  --color-surface-strong: #f1f5f9;
+  --color-surface-elevated: rgba(248, 250, 252, 0.96);
+  --color-border: #dbe4f0;
+  --color-border-strong: #c7d2e5;
+  --color-background: #e7f0ff;
+  --color-background-alt: #edf3ff;
+  --color-success-surface: #eff6ff;
+  --color-success-text: #1e3a8a;
+  --color-danger: #ef4444;
+  --color-danger-soft: #fff1f2;
+  --color-danger-text: #be123c;
+  --color-white-soft: #fcfdff;
+
+  color: var(--color-ink);
+  font: 16px/1.6 var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
