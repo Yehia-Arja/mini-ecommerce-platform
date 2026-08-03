@@ -1,0 +1,31 @@
+{
+  "name": "mini-ecommerce-platform",
+  "version": "1.0.0",
+  "private": true,
+  "description": "A mini e-commerce platform built with React, Express, and PostgreSQL.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "install:all": "npm install --prefix backend && npm install --prefix frontend",
+    "lint": "npm run lint --prefix backend && npm run lint --prefix frontend",
+    "test": "npm run test --prefix backend",
+    "build": "npm run build --prefix backend && npm run build --prefix frontend",
+    "check": "npm run lint && npm run test && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yehia-Arja/mini-ecommerce-platform.git"
+  },
+  "author": "Yehia Al Arja",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yehia-Arja/mini-ecommerce-platform/issues"
+  },
+  "homepage": "https://github.com/Yehia-Arja/mini-ecommerce-platform#readme",
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "eslint": "^10.8.0",
+    "typescript-eslint": "^8.65.0"
+  }
+}
