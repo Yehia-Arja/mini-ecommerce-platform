@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router'
 import { LoginPage } from '../features/auth'
 import { CartPage } from '../features/cart'
 import { ProductDetailsPage } from '../features/products'
+import { WishlistPage, fetchWishlistThunk } from '../features/wishlist'
 import { fetchCurrentUserThunk } from '../features/auth/store/auth.thunks'
 import { HomePage } from '../features/home/pages/HomePage'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
@@ -11,13 +12,20 @@ import { ProtectedRoute } from './ProtectedRoute'
 
 export function AppRouter() {
   const dispatch = useAppDispatch()
-  const status = useAppSelector((state) => state.auth.status)
+  const authStatus = useAppSelector((state) => state.auth.status)
+  const wishlistStatus = useAppSelector((state) => state.wishlist.status)
 
   useEffect(() => {
-    if (status === 'idle') {
+    if (authStatus === 'idle') {
       void dispatch(fetchCurrentUserThunk())
     }
-  }, [dispatch, status])
+  }, [authStatus, dispatch])
+
+  useEffect(() => {
+    if (authStatus === 'authenticated' && wishlistStatus === 'idle') {
+      void dispatch(fetchWishlistThunk())
+    }
+  }, [authStatus, dispatch, wishlistStatus])
 
   return (
     <Routes>
@@ -43,6 +51,14 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <CartPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <WishlistPage />
           </ProtectedRoute>
         }
       />

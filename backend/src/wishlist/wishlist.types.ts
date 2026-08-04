@@ -1,15 +1,9 @@
-export type WishlistProductSummary = {
-  id: string;
-  title: string;
-  description: string;
-  price: number;
-  imageUrl: string | null;
-};
+import type { ProductListItem } from "../products/products.types.js";
 
 export type WishlistItem = {
   id: string;
   createdAt: string;
-  product: WishlistProductSummary;
+  product: ProductListItem;
 };
 
 export type Wishlist = {

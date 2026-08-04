@@ -1,10 +1,13 @@
 import type { QueryResultRow } from "pg";
 
 import { Database } from "../db/database.js";
+import {
+  hydrateProducts,
+  type ProductHydrationRow,
+} from "../products/product-hydration.js";
 import type {
   AddWishlistItemInput,
   Wishlist,
-  WishlistItem,
   WishlistProductRecord,
 } from "./wishlist.types.js";
 
@@ -14,12 +17,12 @@ type ProductRow = {
 };
 
 type WishlistItemRow = {
-  id: string;
+  wishlist_item_id: string;
   created_at: string;
   product_id: string;
   product_title: string;
   product_description: string;
-  product_price: string;
+  product_base_price: string;
   product_image_url: string | null;
 };
 
@@ -38,23 +41,11 @@ async function executeQuery<T extends QueryResultRow>(
   return database.query<T>(text, values);
 }
 
-function hydrateWishlist(userId: string, rows: WishlistItemRow[]): Wishlist {
-  const items: WishlistItem[] = rows.map((row) => ({
-    id: row.id,
-    createdAt: row.created_at,
-    product: {
-      id: row.product_id,
-      title: row.product_title,
-      description: row.product_description,
-      price: Number(row.product_price),
-      imageUrl: row.product_image_url,
-    },
-  }));
-
+function buildEmptyWishlist(userId: string): Wishlist {
   return {
     userId,
-    items,
-    totalItems: items.length,
+    items: [],
+    totalItems: 0,
   };
 }
 
@@ -66,12 +57,12 @@ export class WishlistRepository implements WishlistRepositoryContract {
       this.database,
       `
         SELECT
-          wishlist_items.id,
+          wishlist_items.id AS wishlist_item_id,
           wishlist_items.created_at::TEXT,
           products.id AS product_id,
           products.title AS product_title,
           products.description AS product_description,
-          products.base_price::TEXT AS product_price,
+          products.base_price::TEXT AS product_base_price,
           products.image_url AS product_image_url
         FROM wishlist_items
         INNER JOIN products
@@ -82,7 +73,47 @@ export class WishlistRepository implements WishlistRepositoryContract {
       [userId],
     );
 
-    return hydrateWishlist(userId, result.rows);
+    if (!result.rows.length) {
+      return buildEmptyWishlist(userId);
+    }
+
+    const hydratedProducts = await hydrateProducts(
+      this.database,
+      result.rows.map(
+        (row): ProductHydrationRow => ({
+          id: row.product_id,
+          title: row.product_title,
+          description: row.product_description,
+          base_price: row.product_base_price,
+          image_url: row.product_image_url,
+        }),
+      ),
+    );
+    const productsById = new Map(
+      hydratedProducts.map((product) => [product.id, product] as const),
+    );
+
+    const items = result.rows.flatMap((row) => {
+      const product = productsById.get(row.product_id);
+
+      if (!product) {
+        return [];
+      }
+
+      return [
+        {
+          id: row.wishlist_item_id,
+          createdAt: row.created_at,
+          product,
+        },
+      ];
+    });
+
+    return {
+      userId,
+      items,
+      totalItems: items.length,
+    };
   }
 
   async findProductById(productId: string): Promise<WishlistProductRecord | null> {

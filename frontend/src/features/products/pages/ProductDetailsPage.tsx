@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router'
 import { AppSpinner } from '../../../components/ui/AppSpinner'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { addCartItemThunk, clearCartFeedback, type CartState } from '../../cart'
+import { WishlistToggleButton } from '../../wishlist'
 import { clearSelectedProduct } from '../store/products.slice'
 import { fetchProductByIdThunk } from '../store/products.thunks'
 import type { ProductImage, ProductListItem, ProductVariant } from '../types/products.types'
@@ -299,8 +300,16 @@ const ProductDetailsContent = memo(function ProductDetailsContent({
         ) : null}
 
         <div className="product-details__actions">
+          <WishlistToggleButton
+            className="product-details__tertiary-action"
+            productId={item.id}
+            productTitle={item.title}
+          />
           <Link className="product-details__secondary-action" to="/cart">
             View cart
+          </Link>
+          <Link className="product-details__secondary-action" to="/wishlist">
+            View wishlist
           </Link>
           <Link className="product-details__primary-action" to="/">
             Back to catalog

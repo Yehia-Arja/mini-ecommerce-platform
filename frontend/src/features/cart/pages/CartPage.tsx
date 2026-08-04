@@ -485,6 +485,9 @@ export function CartPage() {
                       <button className="cart-summary-card__primary-action" type="button">
                         Continue to checkout
                       </button>
+                      <Link className="cart-summary-card__secondary-action" to="/wishlist">
+                        Review wishlist
+                      </Link>
                       <Link className="cart-summary-card__secondary-action" to="/">
                         Keep shopping
                       </Link>
