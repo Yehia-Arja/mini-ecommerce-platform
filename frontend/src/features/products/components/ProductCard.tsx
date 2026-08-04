@@ -1,21 +1,13 @@
+import { Link } from 'react-router'
+
 import type { ProductListItem } from '../types/products.types'
+import {
+  formatProductPrice,
+  getProductVariantSummary,
+} from '../utils/product-formatters'
 
 type ProductCardProps = {
   product: ProductListItem
-}
-
-function formatPrice(price: number) {
-  return new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 2,
-  }).format(price)
-}
-
-function getVariantSummary(product: ProductListItem) {
-  return product.variants.length <= 1
-    ? 'Ready to add to cart'
-    : `${product.variants.length} variants available`
 }
 
 export function ProductCard({ product }: ProductCardProps) {
@@ -42,7 +34,9 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="product-card__body">
         <div className="product-card__meta">
           <span className="product-card__eyebrow">Featured Product</span>
-          <span className="product-card__price">{formatPrice(product.price)}</span>
+          <span className="product-card__price">
+            {formatProductPrice(product.price)}
+          </span>
         </div>
 
         <div className="product-card__copy">
@@ -52,8 +46,12 @@ export function ProductCard({ product }: ProductCardProps) {
 
         <div className="product-card__footer">
           <span className="product-card__variants">
-            {getVariantSummary(product)}
+            {getProductVariantSummary(product.variants.length)}
           </span>
+
+          <Link className="product-card__link" to={`/products/${product.id}`}>
+            View details
+          </Link>
         </div>
       </div>
     </article>

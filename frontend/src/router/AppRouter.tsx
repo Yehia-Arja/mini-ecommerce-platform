@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 
 import { LoginPage } from '../features/auth'
+import { ProductDetailsPage } from '../features/products'
 import { fetchCurrentUserThunk } from '../features/auth/store/auth.thunks'
 import { HomePage } from '../features/home/pages/HomePage'
 import { useAppDispatch, useAppSelector } from '../store/hooks'
@@ -25,6 +26,14 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <HomePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/products/:productId"
+        element={
+          <ProtectedRoute>
+            <ProductDetailsPage />
           </ProtectedRoute>
         }
       />

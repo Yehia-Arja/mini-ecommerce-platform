@@ -43,6 +43,12 @@ export type ProductsSuccessResponse = {
   data: ProductsListResponse
 }
 
+export type ProductDetailsResponse = {
+  success: true
+  message: string
+  data: ProductListItem
+}
+
 export type ProductsListParams = {
   page?: number
   pageSize?: number
@@ -50,9 +56,22 @@ export type ProductsListParams = {
 
 export type ProductsStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
 
-export type ProductsState = {
+export type ProductsCatalogState = {
   items: ProductListItem[]
   pagination: ProductsPaginationMeta | null
   status: ProductsStatus
   errorMessage: string | null
+}
+
+export type SelectedProductState = {
+  currentProductId: string | null
+  currentRequestId: string | null
+  item: ProductListItem | null
+  status: ProductsStatus
+  errorMessage: string | null
+}
+
+export type ProductsState = {
+  catalog: ProductsCatalogState
+  selectedProduct: SelectedProductState
 }

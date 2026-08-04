@@ -1,6 +1,7 @@
 import { requestMethods } from '../../../utils/enum/request-methods'
 import { request, type RequestError } from '../../../utils/remote/axios'
 import type {
+  ProductDetailsResponse,
   ProductsListParams,
   ProductsSuccessResponse,
 } from '../types/products.types'
@@ -36,6 +37,19 @@ export async function fetchProducts(params?: ProductsListParams) {
   const response = await request<ProductsSuccessResponse>({
     method: requestMethods.GET,
     route: buildProductsRoute(params),
+  })
+
+  if (isRequestError(response)) {
+    return response
+  }
+
+  return response
+}
+
+export async function fetchProductById(productId: string) {
+  const response = await request<ProductDetailsResponse>({
+    method: requestMethods.GET,
+    route: `${PRODUCTS_ROUTE}/${productId}`,
   })
 
   if (isRequestError(response)) {
