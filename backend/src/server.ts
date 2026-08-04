@@ -16,6 +16,10 @@ import { createProductsController } from "./products/products.controller.js";
 import { ProductsRepository } from "./products/products.repository.js";
 import { createProductsRoutes } from "./products/products.routes.js";
 import { ProductsService } from "./products/products.service.js";
+import { createWishlistController } from "./wishlist/wishlist.controller.js";
+import { WishlistRepository } from "./wishlist/wishlist.repository.js";
+import { createWishlistRoutes } from "./wishlist/wishlist.routes.js";
+import { WishlistService } from "./wishlist/wishlist.service.js";
 
 const config = getServerConfig();
 const database = new Database(config.databaseUrl);
@@ -35,7 +39,11 @@ const cartRepository = new CartRepository(database);
 const cartService = new CartService(cartRepository);
 const cartController = createCartController(cartService);
 const cartRouter = createCartRoutes(cartController, requireAuth);
-const app = createApp(config, { authRouter, productsRouter, cartRouter });
+const wishlistRepository = new WishlistRepository(database);
+const wishlistService = new WishlistService(wishlistRepository);
+const wishlistController = createWishlistController(wishlistService);
+const wishlistRouter = createWishlistRoutes(wishlistController, requireAuth);
+const app = createApp(config, { authRouter, productsRouter, cartRouter, wishlistRouter });
 
 const server = app.listen(config.port, () => {
   console.log(`Backend running on http://localhost:${config.port}`);

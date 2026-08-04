@@ -1,5 +1,6 @@
 import { Link } from 'react-router'
 
+import { WishlistToggleButton } from '../../wishlist'
 import type { ProductListItem } from '../types/products.types'
 import {
   formatProductPrice,
@@ -49,9 +50,17 @@ export function ProductCard({ product }: ProductCardProps) {
             {getProductVariantSummary(product.variants.length)}
           </span>
 
-          <Link className="product-card__link" to={`/products/${product.id}`}>
-            View details
-          </Link>
+          <div className="product-card__actions">
+            <WishlistToggleButton
+              className="product-card__wishlist-action"
+              productId={product.id}
+              productTitle={product.title}
+            />
+
+            <Link className="product-card__link" to={`/products/${product.id}`}>
+              View details
+            </Link>
+          </div>
         </div>
       </div>
     </article>

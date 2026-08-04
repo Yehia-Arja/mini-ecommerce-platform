@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 
 import { sendNoContent, sendSuccess } from "../http/api-response.js";
-import { HttpError } from "../http/errors.js";
+import { requireAuthenticatedUserId } from "../http/request-user.js";
 import type { CartServiceContract } from "./cart.service.js";
 import {
   parseAddCartItemInput,
@@ -32,21 +32,13 @@ export type CartController = {
   ) => Promise<void>;
 };
 
-function requireUserId(request: Request): string {
-  const userId = request.user?.id;
-
-  if (!userId) {
-    throw new HttpError(401, "Authentication is required.");
-  }
-
-  return userId;
-}
-
 export function createCartController(cartService: CartServiceContract): CartController {
   return {
     async getCart(request, response, next) {
       try {
-        const result = await cartService.getCartByUserId(requireUserId(request));
+        const result = await cartService.getCartByUserId(
+          requireAuthenticatedUserId(request),
+        );
 
         sendSuccess(response, 200, result, "Cart retrieved successfully.");
       } catch (error) {
@@ -56,7 +48,7 @@ export function createCartController(cartService: CartServiceContract): CartCont
     async addItem(request, response, next) {
       try {
         const result = await cartService.addItem(
-          requireUserId(request),
+          requireAuthenticatedUserId(request),
           parseAddCartItemInput(request.body),
         );
 
@@ -68,7 +60,7 @@ export function createCartController(cartService: CartServiceContract): CartCont
     async updateItem(request, response, next) {
       try {
         const result = await cartService.updateItem(
-          requireUserId(request),
+          requireAuthenticatedUserId(request),
           parseCartItemId(request.params.cartItemId),
           parseUpdateCartItemInput(request.body),
         );
@@ -81,7 +73,7 @@ export function createCartController(cartService: CartServiceContract): CartCont
     async removeItem(request, response, next) {
       try {
         await cartService.removeItem(
-          requireUserId(request),
+          requireAuthenticatedUserId(request),
           parseCartItemId(request.params.cartItemId),
         );
 

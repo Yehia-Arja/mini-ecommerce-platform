@@ -68,6 +68,9 @@ export function HomePage() {
               <Link className="home-hero__action home-hero__action--secondary" to="/cart">
                 View cart
               </Link>
+              <Link className="home-hero__action home-hero__action--secondary" to="/wishlist">
+                View wishlist
+              </Link>
             </div>
           </div>
 
