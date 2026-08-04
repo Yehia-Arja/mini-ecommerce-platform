@@ -42,6 +42,12 @@ test("parseProductId returns a valid UUID product id", () => {
   assert.equal(parseProductId(productId), productId);
 });
 
+test("parseProductId accepts UUIDs that match the database format even when they are not RFC-version constrained", () => {
+  const productId = "66666666-6666-6666-6666-666666666666";
+
+  assert.equal(parseProductId(productId), productId);
+});
+
 test("parseProductId rejects invalid product ids", () => {
   assert.throws(
     () => parseProductId("not-a-uuid"),
