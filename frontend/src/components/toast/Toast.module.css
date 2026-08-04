@@ -1,0 +1,218 @@
+.container {
+  position: fixed;
+  top: 24px;
+  inset-inline-end: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: 420px;
+  width: 100%;
+}
+
+.toast {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 20px;
+  background-color: #ffffff;
+  border-radius: 20px;
+  box-shadow:
+    0 10px 25px -5px rgba(0, 0, 0, 0.1),
+    0 4px 10px -5px rgba(0, 0, 0, 0.04);
+  pointer-events: auto;
+  overflow: hidden;
+  animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast.dismissing {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+.error {
+  background-color: #fef2f2;
+}
+
+.error .iconBadge {
+  color: var(--color-danger);
+}
+
+.success {
+  background-color: #f0fdf4;
+}
+
+.success .iconBadge {
+  color: #16a34a;
+}
+
+.info {
+  background-color: #eff6ff;
+}
+
+.info .iconBadge {
+  color: var(--color-primary);
+}
+
+.iconBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+}
+
+.message {
+  flex: 1;
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--color-ink);
+  line-height: 1.5;
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: -4px -6px -4px 0;
+  background: none;
+  border: none;
+  color: var(--color-text-soft);
+  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    background-color 160ms ease,
+    color 160ms ease;
+}
+
+.closeButton:hover {
+  background-color: rgba(0, 0, 0, 0.06);
+  color: var(--color-ink);
+}
+
+.timerBar {
+  position: absolute;
+  bottom: 0;
+  inset-inline-start: 0;
+  height: 3px;
+  border-radius: 0 0 20px 20px;
+  animation: timerShrink 5s linear forwards;
+}
+
+.error .timerBar {
+  background-color: var(--color-danger);
+}
+
+.success .timerBar {
+  background-color: #16a34a;
+}
+
+.info .timerBar {
+  background-color: var(--color-primary);
+}
+
+.dismissing .timerBar {
+  animation: none;
+  opacity: 0;
+}
+
+@keyframes timerShrink {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOut {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 100px;
+    margin-bottom: 0;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+    max-height: 0;
+    margin-bottom: -12px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+[dir='rtl'] .toast {
+  animation-name: slideInRtl;
+}
+
+[dir='rtl'] .toast.dismissing {
+  animation-name: slideOutRtl;
+}
+
+@keyframes slideInRtl {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+
+  40% {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRtl {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+    max-height: 100px;
+  }
+
+  to {
+    opacity: 0;
+    transform: translateX(-100%);
+    max-height: 0;
+    margin-bottom: -12px;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    inset-inline-end: 12px;
+    inset-inline-start: 12px;
+    max-width: none;
+  }
+}

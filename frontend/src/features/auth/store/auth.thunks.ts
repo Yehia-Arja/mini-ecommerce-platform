@@ -43,7 +43,11 @@ export const logoutThunk = createAsyncThunk<void, void, { rejectValue: string }>
   async (_, { rejectWithValue }) => {
     const response = await logoutUser()
 
-    if ('error' in response) {
+    if (
+      typeof response === 'object' &&
+      response !== null &&
+      'error' in response
+    ) {
       return rejectWithValue(response.message)
     }
   },

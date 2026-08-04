@@ -1,6 +1,8 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router'
+import { useNavigate } from 'react-router'
 
+import { logoutThunk } from '../../auth'
 import {
   fetchProductsThunk,
   ProductsCatalog,
@@ -26,12 +28,25 @@ function HomeSectionHeader({ eyebrow, title }: { eyebrow: string; title: string 
   )
 }
 
+function getUserInitials(firstName: string, lastName: string | null) {
+  const initials = `${firstName.charAt(0)}${lastName?.charAt(0) ?? ''}`.trim()
+
+  return initials.toUpperCase()
+}
+
 export function HomePage() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { errorMessage, items, status } = useAppSelector(
     (state) => state.products.catalog,
   )
+  const { currentRequestType, status: authStatus, user } = useAppSelector(
+    (state) => state.auth,
+  )
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false)
+  const accountMenuRef = useRef<HTMLDivElement | null>(null)
   const isLoading = status === 'idle' || status === 'loading'
+  const isLoggingOut = currentRequestType === 'logout'
   const heroProducts = items.slice(0, 3)
   const featuredProducts = items.slice(0, 12)
 
@@ -46,12 +61,107 @@ export function HomePage() {
     }
   }, [dispatch, status])
 
+  useEffect(() => {
+    if (authStatus === 'unauthenticated') {
+      navigate('/login', { replace: true })
+    }
+  }, [authStatus, navigate])
+
+  useEffect(() => {
+    if (!isAccountMenuOpen) {
+      return
+    }
+
+    const handlePointerDown = (event: MouseEvent) => {
+      if (!accountMenuRef.current?.contains(event.target as Node)) {
+        setIsAccountMenuOpen(false)
+      }
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setIsAccountMenuOpen(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleEscape)
+
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleEscape)
+    }
+  }, [isAccountMenuOpen])
+
+  const handleLogout = async () => {
+    const result = await dispatch(logoutThunk())
+
+    if (!logoutThunk.fulfilled.match(result)) {
+      return
+    }
+
+    setIsAccountMenuOpen(false)
+  }
+
   return (
     <main className="home-page">
       <div className="home-page__container">
         <section className="home-hero">
           <div className="home-hero__copy">
-            <span className="home-hero__eyebrow">Mini Ecommerce</span>
+            <div className="home-hero__topbar">
+              <span className="home-hero__eyebrow">Mini Ecommerce</span>
+
+              {user ? (
+                <div className="home-account-menu" ref={accountMenuRef}>
+                  <button
+                    className="home-account-menu__trigger"
+                    type="button"
+                    aria-expanded={isAccountMenuOpen}
+                    aria-haspopup="menu"
+                    aria-label="Open account menu"
+                    onClick={() => setIsAccountMenuOpen((current) => !current)}
+                  >
+                    <span className="home-account-menu__avatar">
+                      {getUserInitials(user.firstName, user.lastName)}
+                    </span>
+                    <span className="home-account-menu__details">
+                      <strong>{user.firstName}</strong>
+                      <span>Account</span>
+                    </span>
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M7 10l5 5 5-5"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth="1.8"
+                      />
+                    </svg>
+                  </button>
+
+                  {isAccountMenuOpen ? (
+                    <div className="home-account-menu__panel" role="menu">
+                      <div className="home-account-menu__summary">
+                        <strong>{user.firstName}</strong>
+                        <span>{user.email}</span>
+                      </div>
+
+                      <button
+                        className="home-account-menu__action"
+                        type="button"
+                        role="menuitem"
+                        onClick={() => void handleLogout()}
+                        disabled={isLoggingOut}
+                      >
+                        {isLoggingOut ? 'Signing out...' : 'Log out'}
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+
             <h1>Front-row selections for everyday shopping.</h1>
             <p>
               Browse standout products, explore the details, and find your next pick
