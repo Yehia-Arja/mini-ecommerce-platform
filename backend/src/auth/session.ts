@@ -102,8 +102,8 @@ export function buildRefreshTokenCookie(
     token,
     ttlDays * 24 * 60 * 60,
     secure,
-    "/api/auth/refresh",
-    "Strict",
+    "/api/auth",
+    "Lax",
   );
 }
 
@@ -115,7 +115,7 @@ function buildExpiredCookie(
   return serializeCookie(name, "", {
     httpOnly: true,
     secure,
-    sameSite: path === "/" ? "Lax" : "Strict",
+    sameSite: "Lax",
     path,
     maxAge: 0,
   });
@@ -132,5 +132,5 @@ export function buildExpiredRefreshTokenCookie(
   name: string,
   secure: boolean,
 ): string {
-  return buildExpiredCookie(name, secure, "/api/auth/refresh");
+  return buildExpiredCookie(name, secure, "/api/auth");
 }
