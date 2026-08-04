@@ -1,4 +1,5 @@
 export { fetchProducts } from './services/products.service'
+export { ProductsCatalog } from './components/ProductsCatalog'
 export type {
   ProductImage,
   ProductListItem,
