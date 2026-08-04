@@ -328,6 +328,12 @@
   gap: 12px;
 }
 
+.cart-summary-card__note {
+  color: var(--color-ink-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
 .cart-summary-card__row {
   display: flex;
   align-items: center;

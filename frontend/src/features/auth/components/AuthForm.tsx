@@ -6,7 +6,7 @@ import { AppSpinner } from '../../../components/ui/AppSpinner'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { loginFormSchema } from '../schemas/auth.schema'
 import { clearAuthFeedback } from '../store/auth.slice'
-import { loginThunk } from '../store/auth.thunks'
+import { fetchCurrentUserThunk, loginThunk } from '../store/auth.thunks'
 import type {
   LoginFormErrors,
   LoginFormValues,
@@ -129,7 +129,13 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
       }),
     )
 
-    if (loginThunk.fulfilled.match(resultAction)) {
+    if (!loginThunk.fulfilled.match(resultAction)) {
+      return
+    }
+
+    const sessionResult = await dispatch(fetchCurrentUserThunk())
+
+    if (fetchCurrentUserThunk.fulfilled.match(sessionResult)) {
       setValues(initialValues)
       setIsPasswordVisible(false)
       onSuccess()

@@ -10,6 +10,7 @@ type AppDependencies = {
   productsRouter?: Router;
   cartRouter?: Router;
   wishlistRouter?: Router;
+  ordersRouter?: Router;
 };
 
 export function createApp(config: AppConfig, dependencies: AppDependencies = {}) {
@@ -38,6 +39,10 @@ export function createApp(config: AppConfig, dependencies: AppDependencies = {})
 
   if (dependencies.wishlistRouter) {
     app.use("/api/wishlist", dependencies.wishlistRouter);
+  }
+
+  if (dependencies.ordersRouter) {
+    app.use("/api/orders", dependencies.ordersRouter);
   }
 
   app.get("/api/health", (_request, response) => {

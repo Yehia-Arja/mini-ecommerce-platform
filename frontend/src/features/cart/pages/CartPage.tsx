@@ -1,5 +1,5 @@
 import { memo, useEffect, useMemo, useState } from 'react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import { AppSpinner } from '../../../components/ui/AppSpinner'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
@@ -9,6 +9,7 @@ import {
   removeCartItemThunk,
   updateCartItemThunk,
 } from '..'
+import { clearOrdersFeedback, placeOrderThunk } from '../../orders'
 import {
   fetchProductById,
   fetchProductsThunk,
@@ -201,6 +202,7 @@ const CartRecommendations = memo(function CartRecommendations({
 
 export function CartPage() {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const { items: catalogItems, status: catalogStatus } = useAppSelector(
     (state) => state.products.catalog,
   )
@@ -211,6 +213,10 @@ export function CartPage() {
     mutationStatus,
     status,
   } = useAppSelector((state) => state.cart)
+  const {
+    errorMessage: orderErrorMessage,
+    placementStatus,
+  } = useAppSelector((state) => state.orders)
   const [productDetailsById, setProductDetailsById] = useState<
     Record<string, ProductListItem>
   >({})
@@ -283,6 +289,7 @@ export function CartPage() {
   useEffect(() => {
     return () => {
       dispatch(clearCartFeedback())
+      dispatch(clearOrdersFeedback())
     }
   }, [dispatch])
 
@@ -311,10 +318,6 @@ export function CartPage() {
     }, {})
   }, [cart?.items, catalogItems, productDetailsById])
 
-  const estimatedShipping = cart?.items.length ? 12 : 0
-  const estimatedTax = (cart?.total ?? 0) * 0.08
-  const grandTotal = (cart?.total ?? 0) + estimatedShipping + estimatedTax
-
   const handleQuantityChange = (
     item: CartItem,
     direction: 'increment' | 'decrement',
@@ -336,6 +339,20 @@ export function CartPage() {
 
   const handleRemoveItem = (itemId: string) => {
     void dispatch(removeCartItemThunk(itemId))
+  }
+
+  const handlePlaceOrder = async () => {
+    dispatch(clearCartFeedback())
+    dispatch(clearOrdersFeedback())
+
+    const result = await dispatch(placeOrderThunk())
+
+    if (!placeOrderThunk.fulfilled.match(result)) {
+      return
+    }
+
+    await dispatch(fetchCartThunk())
+    void navigate(`/orders/${result.payload.id}`)
   }
 
   const handleVariantChange = (itemId: string, nextVariantId: string) => {
@@ -420,6 +437,15 @@ export function CartPage() {
               </section>
             ) : null}
 
+            {orderErrorMessage ? (
+              <section className="products-status products-status--error" role="alert">
+                <div>
+                  <h2>We could not complete checkout.</h2>
+                  <p>{orderErrorMessage}</p>
+                </div>
+              </section>
+            ) : null}
+
             {pageState.cart.items.length ? (
               <section className="cart-layout">
                 <div className="cart-items-panel">
@@ -464,26 +490,34 @@ export function CartPage() {
 
                     <div className="cart-summary-card__rows">
                       <div className="cart-summary-card__row">
-                        <span>Subtotal</span>
+                        <span>Items total</span>
                         <strong>{formatProductPrice(pageState.cart.total)}</strong>
                       </div>
                       <div className="cart-summary-card__row">
-                        <span>Estimated shipping</span>
-                        <strong>{formatProductPrice(estimatedShipping)}</strong>
-                      </div>
-                      <div className="cart-summary-card__row">
-                        <span>Estimated tax</span>
-                        <strong>{formatProductPrice(estimatedTax)}</strong>
+                        <span>Checkout type</span>
+                        <strong>Mocked confirmation</strong>
                       </div>
                       <div className="cart-summary-card__row cart-summary-card__row--total">
-                        <span>Total</span>
-                        <strong>{formatProductPrice(grandTotal)}</strong>
+                        <span>Order total</span>
+                        <strong>{formatProductPrice(pageState.cart.total)}</strong>
                       </div>
                     </div>
 
+                    <p className="cart-summary-card__note">
+                      The backend calculates the final order total from the current cart
+                      items when you place the order.
+                    </p>
+
                     <div className="cart-summary-card__actions">
-                      <button className="cart-summary-card__primary-action" type="button">
-                        Continue to checkout
+                      <button
+                        className="cart-summary-card__primary-action"
+                        type="button"
+                        onClick={() => void handlePlaceOrder()}
+                        disabled={
+                          placementStatus === 'loading' || mutationStatus === 'loading'
+                        }
+                      >
+                        {placementStatus === 'loading' ? 'Placing order...' : 'Place order'}
                       </button>
                       <Link className="cart-summary-card__secondary-action" to="/wishlist">
                         Review wishlist
