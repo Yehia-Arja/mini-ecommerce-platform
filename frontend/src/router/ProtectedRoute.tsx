@@ -1,5 +1,5 @@
-import { useEffect } from 'react'
 import type { ReactNode } from 'react'
+import { Navigate } from 'react-router'
 
 import { AppSpinner } from '../components/ui/AppSpinner'
 import { useAppSelector } from '../store/hooks'
@@ -7,20 +7,10 @@ import './router.css'
 
 type ProtectedRouteProps = {
   children: ReactNode
-  onUnauthorized: () => void
 }
 
-export function ProtectedRoute({
-  children,
-  onUnauthorized,
-}: ProtectedRouteProps) {
+export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { status, user } = useAppSelector((state) => state.auth)
-
-  useEffect(() => {
-    if (status !== 'idle' && status !== 'checking' && !user) {
-      onUnauthorized()
-    }
-  }, [onUnauthorized, status, user])
 
   if (status === 'idle' || status === 'checking') {
     return (
@@ -31,7 +21,7 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    return null
+    return <Navigate to="/login" replace />
   }
 
   return <>{children}</>
