@@ -47,3 +47,12 @@ export type ProductsListParams = {
   page?: number
   pageSize?: number
 }
+
+export type ProductsStatus = 'idle' | 'loading' | 'succeeded' | 'failed'
+
+export type ProductsState = {
+  items: ProductListItem[]
+  pagination: ProductsPaginationMeta | null
+  status: ProductsStatus
+  errorMessage: string | null
+}

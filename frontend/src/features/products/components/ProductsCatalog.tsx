@@ -27,10 +27,10 @@ export function ProductsCatalog({
     return (
       <section className="products-empty" aria-live="polite">
         <span className="products-empty__badge">Catalog</span>
-        <h2>Products will appear here shortly.</h2>
+        <h2>No products available right now.</h2>
         <p>
-          The listing layout is ready. Once we wire the fetch layer into Redux,
-          this page will render your live catalog with pagination.
+          Check back in a bit to explore the latest arrivals and everyday
+          essentials.
         </p>
       </section>
     )
