@@ -10,18 +10,21 @@
     "build": "tsc",
     "start": "node dist/server.js",
     "lint": "eslint src eslint.config.js",
-    "test": "node --import tsx --test src/**/*.test.ts"
+    "test": "node --import tsx --test src/**/*.test.ts",
+    "db:migrate": "tsx src/db/runMigrations.ts"
   },
   "dependencies": {
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "pg": "^8.22.0"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
+    "@eslint/js": "^9.39.5",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^26.1.2",
+    "@types/pg": "^8.20.3",
     "eslint": "^9.39.5",
     "tsx": "^4.23.5",
     "typescript": "5.9.2",

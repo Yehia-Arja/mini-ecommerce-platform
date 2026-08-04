@@ -1,0 +1,32 @@
+.app-spinner {
+  display: inline-block;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  animation: app-spinner-rotate 0.8s linear infinite;
+}
+
+.app-spinner--inverse {
+  border-color: rgba(252, 253, 255, 0.34);
+  border-top-color: var(--color-white-soft);
+}
+
+.app-spinner--primary {
+  border-color: rgba(37, 99, 235, 0.18);
+  border-top-color: var(--color-primary);
+}
+
+.app-spinner--sm {
+  width: 16px;
+  height: 16px;
+}
+
+.app-spinner--md {
+  width: 18px;
+  height: 18px;
+}
+
+@keyframes app-spinner-rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
