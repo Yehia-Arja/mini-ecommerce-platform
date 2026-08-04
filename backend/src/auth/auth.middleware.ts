@@ -28,6 +28,7 @@ export function createRequireAuthMiddleware(
         throw new HttpError(401, "Authentication is required.");
       }
 
+      request.user = user;
       next();
     } catch (error) {
       next(error);

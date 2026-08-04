@@ -46,6 +46,8 @@ export type AuthStatus =
 export type AuthState = {
   user: AuthUser | null
   status: AuthStatus
+  currentRequestId: string | null
+  currentRequestType: 'session' | 'login' | 'logout' | null
   errorMessage: string | null
   infoMessage: string | null
 }

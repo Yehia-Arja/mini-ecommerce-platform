@@ -7,6 +7,10 @@ import { AuthRepository } from "./auth/auth.repository.js";
 import { AuthService } from "./auth/auth.service.js";
 import { createApp } from "./app.js";
 import { getServerConfig } from "./config.js";
+import { createCartController } from "./cart/cart.controller.js";
+import { CartRepository } from "./cart/cart.repository.js";
+import { createCartRoutes } from "./cart/cart.routes.js";
+import { CartService } from "./cart/cart.service.js";
 import { Database } from "./db/database.js";
 import { createProductsController } from "./products/products.controller.js";
 import { ProductsRepository } from "./products/products.repository.js";
@@ -27,7 +31,11 @@ const productsRepository = new ProductsRepository(database);
 const productsService = new ProductsService(productsRepository);
 const productsController = createProductsController(productsService);
 const productsRouter = createProductsRoutes(productsController, requireAuth);
-const app = createApp(config, { authRouter, productsRouter });
+const cartRepository = new CartRepository(database);
+const cartService = new CartService(cartRepository);
+const cartController = createCartController(cartService);
+const cartRouter = createCartRoutes(cartController, requireAuth);
+const app = createApp(config, { authRouter, productsRouter, cartRouter });
 
 const server = app.listen(config.port, () => {
   console.log(`Backend running on http://localhost:${config.port}`);

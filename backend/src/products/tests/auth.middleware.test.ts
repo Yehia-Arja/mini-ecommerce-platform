@@ -87,3 +87,87 @@ test("requireAuth middleware rejects unauthenticated access to protected product
     });
   }
 });
+
+test("requireAuth middleware attaches the authenticated user to the request", async () => {
+  const authService = {
+    async getCurrentUser() {
+      return {
+        id: "user-1",
+        firstName: "Yehia",
+        lastName: null,
+        email: "yehia@example.com",
+        phoneNumber: null,
+        status: "active" as const,
+        emailVerifiedAt: null,
+        userType: "customer",
+        loginCount: 0,
+        lastLoginIp: null,
+        lastLoginAt: null,
+        language: "en",
+        countryCode: null,
+        registrationIp: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+    },
+  } satisfies Pick<AuthService, "getCurrentUser">;
+
+  const requireAuth = createRequireAuthMiddleware(
+    authService,
+    testConfig,
+  );
+
+  let seenUserId: string | null = null;
+
+  const controller: ProductsController = {
+    async listProducts(request, response) {
+      seenUserId = request.user?.id ?? null;
+      response.status(200).json({
+        success: true,
+        message: "products",
+        data: { ok: true },
+      });
+    },
+    async getProductById(_request, response) {
+      response.status(200).json({
+        success: true,
+        message: "product",
+        data: { ok: true },
+      });
+    },
+  };
+
+  const app = createApp(testConfig, {
+    productsRouter: createProductsRoutes(controller, requireAuth),
+  });
+
+  const server = app.listen(0);
+
+  try {
+    const address = server.address();
+
+    if (!address || typeof address === "string") {
+      throw new Error("Expected numeric server port.");
+    }
+
+    const response = await fetch(`http://127.0.0.1:${address.port}/api/products`, {
+      headers: {
+        cookie: "test_access=session-1",
+      },
+    });
+
+    assert.equal(response.status, 200);
+    assert.equal(seenUserId, "user-1");
+  } finally {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error);
+          return;
+        }
+
+        resolve();
+      });
+    });
+  }
+});
