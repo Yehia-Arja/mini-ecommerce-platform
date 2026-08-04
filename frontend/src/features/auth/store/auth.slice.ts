@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+import { resetAppState } from '../../../store/app.actions'
 import type { AuthState } from '../types/auth.types'
 import {
   fetchCurrentUserThunk,
@@ -68,6 +69,7 @@ const authSlice = createSlice({
       .addCase(logoutThunk.rejected, (state, action) => {
         state.errorMessage = action.payload ?? 'Unable to sign out right now.'
       })
+      .addCase(resetAppState, () => initialState)
   },
 })
 

@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+import { resetAppState } from '../../../store/app.actions'
 import type { ProductsState } from '../types/products.types'
 import { fetchProductsThunk } from './products.thunks'
 
@@ -30,6 +31,7 @@ const productsSlice = createSlice({
         state.status = 'failed'
         state.errorMessage = action.payload ?? 'Unable to load products.'
       })
+      .addCase(resetAppState, () => initialState)
   },
 })
 

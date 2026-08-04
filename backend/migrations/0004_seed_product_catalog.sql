@@ -53,7 +53,7 @@ VALUES
     'Ceramic Coffee Mug',
     'Minimal ceramic mug with a comfortable handle and matte finish.',
     14.00,
-    'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
     'active'
   ),
   (
@@ -93,7 +93,7 @@ VALUES
     'Yoga Mat',
     'Non-slip yoga mat with cushioned support for home and studio sessions.',
     34.00,
-    'https://images.unsplash.com/photo-1599447292412-7f2fc1f5e62d?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80',
     'active'
   ),
   (
@@ -413,7 +413,7 @@ VALUES
   (
     '66666666-9999-9999-9999-999999999996',
     '66666666-6666-6666-6666-666666666666',
-    'https://images.unsplash.com/photo-1514228742587-6b1558fcf93a?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&w=900&q=80',
     0,
     TRUE
   ),
@@ -448,7 +448,7 @@ VALUES
   (
     'bbbbbbbb-9999-9999-9999-99999999999b',
     'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    'https://images.unsplash.com/photo-1599447292412-7f2fc1f5e62d?auto=format&fit=crop&w=900&q=80',
+    'https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=900&q=80',
     0,
     TRUE
   ),

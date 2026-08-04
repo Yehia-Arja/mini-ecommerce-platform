@@ -1,5 +1,8 @@
 import axios from 'axios'
 
+import { isLoginRoute, redirectToLogin } from '../../router/navigation'
+import { resetAppState } from '../../store/app.actions'
+import { store } from '../../store/store'
 import type { RequestMethod } from '../enum/request-methods'
 
 axios.defaults.baseURL =
@@ -38,6 +41,14 @@ export const request = async <T = unknown>({
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError<ApiErrorResponse>(error)) {
+      if (error.response?.status === 401) {
+        store.dispatch(resetAppState())
+
+        if (!isLoginRoute()) {
+          redirectToLogin()
+        }
+      }
+
       return {
         error: true,
         message:
