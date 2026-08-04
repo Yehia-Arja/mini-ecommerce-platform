@@ -24,12 +24,14 @@ interface RequestOptions {
   method: RequestMethod
   route: string
   body?: unknown
+  handleUnauthorized?: boolean
 }
 
 export const request = async <T = unknown>({
   method,
   route,
   body,
+  handleUnauthorized = true,
 }: RequestOptions): Promise<T | RequestError> => {
   try {
     const response = await axios.request<T>({
@@ -41,7 +43,7 @@ export const request = async <T = unknown>({
     return response.data
   } catch (error: unknown) {
     if (axios.isAxiosError<ApiErrorResponse>(error)) {
-      if (error.response?.status === 401) {
+      if (handleUnauthorized && error.response?.status === 401) {
         store.dispatch(resetAppState())
 
         if (!isLoginRoute()) {

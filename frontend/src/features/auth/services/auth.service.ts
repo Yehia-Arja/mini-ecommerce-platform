@@ -22,6 +22,7 @@ export async function loginUser(payload: LoginPayload) {
     method: requestMethods.POST,
     route: `${AUTH_ROUTE}/login`,
     body: payload,
+    handleUnauthorized: false,
   })
 
   if (isRequestError(response)) {
