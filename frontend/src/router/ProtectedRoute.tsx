@@ -11,18 +11,15 @@ type ProtectedRouteProps = {
 
 export function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { status, user } = useAppSelector((state) => state.auth)
+  const isCheckingAuth = status === 'idle' || status === 'checking'
 
-  if (status === 'idle' || status === 'checking') {
-    return (
-      <main className="route-status-page">
-        <AppSpinner label="Checking session" size="md" tone="primary" />
-      </main>
-    )
-  }
-
-  if (!user) {
-    return <Navigate to="/login" replace />
-  }
-
-  return <>{children}</>
+  return isCheckingAuth ? (
+    <main className="route-status-page">
+      <AppSpinner label="Checking session" size="md" tone="primary" />
+    </main>
+  ) : user ? (
+    <>{children}</>
+  ) : (
+    <Navigate to="/login" replace />
+  )
 }

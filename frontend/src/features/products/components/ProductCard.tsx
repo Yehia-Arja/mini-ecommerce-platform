@@ -13,11 +13,9 @@ function formatPrice(price: number) {
 }
 
 function getVariantSummary(product: ProductListItem) {
-  if (product.variants.length <= 1) {
-    return 'Ready to add to cart'
-  }
-
-  return `${product.variants.length} variants available`
+  return product.variants.length <= 1
+    ? 'Ready to add to cart'
+    : `${product.variants.length} variants available`
 }
 
 export function ProductCard({ product }: ProductCardProps) {
