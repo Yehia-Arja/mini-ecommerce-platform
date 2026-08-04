@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router'
 
 import { LoginPage } from '../features/auth'
 import { CartPage } from '../features/cart'
+import { OrderConfirmationPage } from '../features/orders'
 import { ProductDetailsPage } from '../features/products'
 import { WishlistPage, fetchWishlistThunk } from '../features/wishlist'
 import { fetchCurrentUserThunk } from '../features/auth/store/auth.thunks'
@@ -59,6 +60,14 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <WishlistPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/orders/:orderId"
+        element={
+          <ProtectedRoute>
+            <OrderConfirmationPage />
           </ProtectedRoute>
         }
       />
