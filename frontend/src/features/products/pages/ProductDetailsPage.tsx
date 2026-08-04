@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { memo, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router'
 
 import { AppSpinner } from '../../../components/ui/AppSpinner'
@@ -13,6 +13,12 @@ import {
 } from '../utils/product-formatters'
 import './ProductsPage.css'
 
+type ProductDetailsViewState =
+  | { type: 'missing-id' }
+  | { type: 'loading' }
+  | { type: 'error'; message: string }
+  | { type: 'ready'; item: ProductListItem }
+
 function getProductHeroImage(images: ProductImage[], fallbackImageUrl: string | null) {
   const primaryImage = images.find((image) => image.isPrimary)
 
@@ -20,15 +26,13 @@ function getProductHeroImage(images: ProductImage[], fallbackImageUrl: string | 
 }
 
 function getProductAvailabilityLabel(variants: ProductVariant[]) {
-  if (!variants.length) {
-    return 'No variants listed yet'
-  }
-
-  const inStockVariants = variants.filter((variant) => variant.stockQuantity > 0).length
-
-  return inStockVariants > 0
-    ? `${inStockVariants} in-stock variant${inStockVariants === 1 ? '' : 's'}`
-    : 'Currently out of stock'
+  return variants.length === 0
+    ? 'No variants listed yet'
+    : variants.filter((variant) => variant.stockQuantity > 0).length > 0
+      ? `${variants.filter((variant) => variant.stockQuantity > 0).length} in-stock variant${
+          variants.filter((variant) => variant.stockQuantity > 0).length === 1 ? '' : 's'
+        }`
+      : 'Currently out of stock'
 }
 
 function getStartingPriceLabel(price: number, variants: ProductVariant[]) {
@@ -38,7 +42,7 @@ function getStartingPriceLabel(price: number, variants: ProductVariant[]) {
   return `${formatProductPrice(lowestPrice)} / item`
 }
 
-function ProductDetailsContent({
+const ProductDetailsContent = memo(function ProductDetailsContent({
   item,
   cartState,
 }: {
@@ -80,7 +84,7 @@ function ProductDetailsContent({
     cartState.mutationStatus === 'loading' &&
     cartState.activeVariantId === selectedVariant?.id
 
-  function handleAddToCart() {
+  const handleAddToCart = () => {
     if (!selectedVariant) {
       return
     }
@@ -228,7 +232,7 @@ function ProductDetailsContent({
             <div className="product-details__section-header">
               <h2 id="product-purchase">Add to cart</h2>
               <p>
-                {selectedVariant.name} · {formatProductPrice(selectedVariant.price)}
+                {selectedVariant.name} - {formatProductPrice(selectedVariant.price)}
               </p>
             </div>
 
@@ -305,7 +309,7 @@ function ProductDetailsContent({
       </div>
     </section>
   )
-}
+})
 
 export function ProductDetailsPage() {
   const dispatch = useAppDispatch()
@@ -328,10 +332,56 @@ export function ProductDetailsPage() {
     }
   }, [dispatch, productId])
 
-  if (!productId) {
-    return (
-      <main className="products-page">
-        <div className="products-page__container">
+  const viewState: ProductDetailsViewState =
+    !productId
+      ? { type: 'missing-id' }
+      : status === 'idle' || status === 'loading'
+        ? { type: 'loading' }
+        : errorMessage || !item
+          ? { type: 'error', message: errorMessage ?? 'The product is unavailable right now.' }
+          : { type: 'ready', item }
+
+  return (
+    <main className="products-page">
+      <div className="products-page__container">
+        {viewState.type === 'ready' ? (
+          <>
+            <nav className="products-breadcrumb" aria-label="Breadcrumb">
+              <Link className="products-breadcrumb__link" to="/">
+                Catalog
+              </Link>
+              <span className="products-breadcrumb__separator">/</span>
+              <span className="products-breadcrumb__current">{viewState.item.title}</span>
+            </nav>
+
+            <ProductDetailsContent item={viewState.item} cartState={cartState} />
+          </>
+        ) : viewState.type === 'loading' ? (
+          <section className="product-details product-details--loading">
+            <AppSpinner label="Loading product details" size="md" tone="primary" />
+          </section>
+        ) : viewState.type === 'error' ? (
+          <section className="products-status products-status--error" role="alert">
+            <div>
+              <h2>We could not load this product.</h2>
+              <p>{viewState.message}</p>
+            </div>
+
+            <div className="products-status__actions">
+              <button
+                className="products-status__action"
+                type="button"
+                onClick={() => (productId ? void dispatch(fetchProductByIdThunk(productId)) : null)}
+              >
+                Try again
+              </button>
+
+              <Link className="products-status__link" to="/">
+                Back to catalog
+              </Link>
+            </div>
+          </section>
+        ) : (
           <section className="products-status products-status--error" role="alert">
             <div>
               <h2>We could not identify this product.</h2>
@@ -342,64 +392,7 @@ export function ProductDetailsPage() {
               Back to catalog
             </Link>
           </section>
-        </div>
-      </main>
-    )
-  }
-
-  if (status === 'idle' || status === 'loading') {
-    return (
-      <main className="products-page">
-        <div className="products-page__container">
-          <section className="product-details product-details--loading">
-            <AppSpinner label="Loading product details" size="md" tone="primary" />
-          </section>
-        </div>
-      </main>
-    )
-  }
-
-  if (errorMessage || !item) {
-    return (
-      <main className="products-page">
-        <div className="products-page__container">
-          <section className="products-status products-status--error" role="alert">
-            <div>
-              <h2>We could not load this product.</h2>
-              <p>{errorMessage ?? 'The product is unavailable right now.'}</p>
-            </div>
-
-            <div className="products-status__actions">
-              <button
-                className="products-status__action"
-                type="button"
-                onClick={() => void dispatch(fetchProductByIdThunk(productId))}
-              >
-                Try again
-              </button>
-
-              <Link className="products-status__link" to="/">
-                Back to catalog
-              </Link>
-            </div>
-          </section>
-        </div>
-      </main>
-    )
-  }
-
-  return (
-    <main className="products-page">
-      <div className="products-page__container">
-        <nav className="products-breadcrumb" aria-label="Breadcrumb">
-          <Link className="products-breadcrumb__link" to="/">
-            Catalog
-          </Link>
-          <span className="products-breadcrumb__separator">/</span>
-          <span className="products-breadcrumb__current">{item.title}</span>
-        </nav>
-
-        <ProductDetailsContent key={item.id} item={item} cartState={cartState} />
+        )}
       </div>
     </main>
   )

@@ -75,7 +75,7 @@ const cartSlice = createSlice({
         state.mutationStatus = 'idle'
         state.activeItemId = null
         state.activeVariantId = null
-        state.infoMessage = 'Cart updated successfully.'
+        state.infoMessage = null
       })
       .addCase(updateCartItemThunk.rejected, (state, action) => {
         state.mutationStatus = 'idle'
@@ -95,7 +95,7 @@ const cartSlice = createSlice({
         state.status = 'succeeded'
         state.mutationStatus = 'idle'
         state.activeItemId = null
-        state.infoMessage = 'Item removed from cart successfully.'
+        state.infoMessage = null
       })
       .addCase(removeCartItemThunk.rejected, (state, action) => {
         state.mutationStatus = 'idle'
