@@ -37,6 +37,13 @@ test("requireAuth middleware rejects unauthenticated access to protected product
         data: { ok: true },
       });
     },
+    async getProductById(_request, response) {
+      response.status(200).json({
+        success: true,
+        message: "product",
+        data: { ok: true },
+      });
+    },
   };
 
   const app = createApp(testConfig, {

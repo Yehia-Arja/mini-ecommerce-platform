@@ -2,7 +2,10 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { HttpError } from "../../http/errors.js";
-import { parseProductsPaginationQuery } from "../products.validation.js";
+import {
+  parseProductId,
+  parseProductsPaginationQuery,
+} from "../products.validation.js";
 
 test("parseProductsPaginationQuery returns defaults when no query params are provided", () => {
   const result = parseProductsPaginationQuery({});
@@ -30,5 +33,21 @@ test("parseProductsPaginationQuery rejects pageSize values above the supported m
       error instanceof HttpError &&
       error.statusCode === 400 &&
       error.message === 'Query parameter "pageSize" must be at most 50.',
+  );
+});
+
+test("parseProductId returns a valid UUID product id", () => {
+  const productId = "123e4567-e89b-12d3-a456-426614174000";
+
+  assert.equal(parseProductId(productId), productId);
+});
+
+test("parseProductId rejects invalid product ids", () => {
+  assert.throws(
+    () => parseProductId("not-a-uuid"),
+    (error: unknown) =>
+      error instanceof HttpError &&
+      error.statusCode === 400 &&
+      error.message === 'Route parameter "productId" must be a valid UUID.',
   );
 });

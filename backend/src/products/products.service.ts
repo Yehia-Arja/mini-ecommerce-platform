@@ -1,11 +1,14 @@
+import { HttpError } from "../http/errors.js";
 import type { ProductsRepositoryContract } from "./products.repository.js";
 import type {
+  ProductListItem,
   ProductsListingResponse,
   ProductsPaginationInput,
 } from "./products.types.js";
 
 export type ProductsServiceContract = {
   listProducts(input: ProductsPaginationInput): Promise<ProductsListingResponse>;
+  getProductById(productId: string): Promise<ProductListItem>;
 };
 
 export class ProductsService implements ProductsServiceContract {
@@ -26,5 +29,15 @@ export class ProductsService implements ProductsServiceContract {
         totalPages,
       },
     };
+  }
+
+  async getProductById(productId: string): Promise<ProductListItem> {
+    const product = await this.repository.getProductById(productId);
+
+    if (!product) {
+      throw new HttpError(404, "Product not found.");
+    }
+
+    return product;
   }
 }

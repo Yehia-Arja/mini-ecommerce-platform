@@ -4,6 +4,8 @@ import type { ProductsPaginationInput } from "./products.types.js";
 const DEFAULT_PAGE = 1;
 const DEFAULT_PAGE_SIZE = 15;
 const MAX_PAGE_SIZE = 50;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function parsePositiveInteger(
   rawValue: unknown,
@@ -51,4 +53,16 @@ export function parseProductsPaginationQuery(
     page,
     pageSize,
   };
+}
+
+export function parseProductId(rawValue: unknown): string {
+  if (typeof rawValue !== "string" || rawValue.trim() === "") {
+    throw new HttpError(400, 'Route parameter "productId" is required.');
+  }
+
+  if (!UUID_PATTERN.test(rawValue)) {
+    throw new HttpError(400, 'Route parameter "productId" must be a valid UUID.');
+  }
+
+  return rawValue;
 }

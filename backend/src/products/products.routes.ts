@@ -9,6 +9,7 @@ export function createProductsRoutes(
   const router = Router();
 
   router.get("/", requireAuth, productsController.listProducts);
+  router.get("/:productId", requireAuth, productsController.getProductById);
 
   return router;
 }

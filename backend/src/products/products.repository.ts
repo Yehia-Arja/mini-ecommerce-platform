@@ -42,6 +42,7 @@ export type ProductsRepositoryContract = {
   listProducts(
     input: ProductsPaginationInput,
   ): Promise<{ items: ProductListItem[]; totalItems: number }>;
+  getProductById(productId: string): Promise<ProductListItem | null>;
 };
 
 function toMoney(value: string | null): number | null {
@@ -73,6 +74,138 @@ async function executeQuery<T extends QueryResultRow>(
   values: readonly unknown[] = [],
 ) {
   return database.query<T>(text, values);
+}
+
+async function loadProductImages(
+  database: Database,
+  productIds: string[],
+) {
+  if (!productIds.length) {
+    return new Map<string, ProductImage[]>();
+  }
+
+  const imagesResult = await executeQuery<ProductImageRow>(
+    database,
+    `
+      SELECT
+        id,
+        product_id,
+        image_url,
+        display_order,
+        is_primary
+      FROM product_images
+      WHERE product_id = ANY($1::uuid[])
+      ORDER BY is_primary DESC, display_order ASC, created_at ASC
+    `,
+    [productIds],
+  );
+
+  const imagesByProductId = new Map<string, ProductImage[]>();
+
+  for (const row of imagesResult.rows) {
+    const productImages = imagesByProductId.get(row.product_id) ?? [];
+    productImages.push({
+      id: row.id,
+      imageUrl: row.image_url,
+      displayOrder: row.display_order,
+      isPrimary: row.is_primary,
+    });
+    imagesByProductId.set(row.product_id, productImages);
+  }
+
+  return imagesByProductId;
+}
+
+async function loadProductVariants(
+  database: Database,
+  productsById: Map<string, ProductRow>,
+  productIds: string[],
+) {
+  if (!productIds.length) {
+    return new Map<string, ProductVariant[]>();
+  }
+
+  const variantsResult = await executeQuery<ProductVariantRow>(
+    database,
+    `
+      SELECT
+        id,
+        product_id,
+        name,
+        code,
+        override_price::TEXT,
+        stock_quantity,
+        is_active
+      FROM product_variants
+      WHERE product_id = ANY($1::uuid[])
+        AND is_active = TRUE
+      ORDER BY created_at ASC, name ASC
+    `,
+    [productIds],
+  );
+
+  const variantsByProductId = new Map<string, ProductVariant[]>();
+
+  for (const row of variantsResult.rows) {
+    const product = productsById.get(row.product_id);
+
+    if (!product) {
+      continue;
+    }
+
+    const basePrice = Number(product.base_price);
+    const overridePrice = toMoney(row.override_price);
+    const productVariants = variantsByProductId.get(row.product_id) ?? [];
+
+    productVariants.push({
+      id: row.id,
+      name: row.name,
+      code: row.code,
+      price: overridePrice ?? basePrice,
+      overridePrice,
+      stockQuantity: row.stock_quantity,
+      isActive: row.is_active,
+    });
+
+    variantsByProductId.set(row.product_id, productVariants);
+  }
+
+  return variantsByProductId;
+}
+
+async function hydrateProducts(
+  database: Database,
+  products: ProductRow[],
+): Promise<ProductListItem[]> {
+  if (!products.length) {
+    return [];
+  }
+
+  const productIds = products.map((product) => product.id);
+  const productsById = new Map(
+    products.map((product) => [product.id, product] as const),
+  );
+
+  const [imagesByProductId, variantsByProductId] = await Promise.all([
+    loadProductImages(database, productIds),
+    loadProductVariants(database, productsById, productIds),
+  ]);
+
+  for (const product of products) {
+    if (!imagesByProductId.has(product.id)) {
+      imagesByProductId.set(product.id, buildFallbackImages(product));
+    }
+  }
+
+  return products.map((product) => ({
+    id: product.id,
+    title: product.title,
+    description: product.description,
+    price: Number(product.base_price),
+    imageUrl: product.image_url,
+    images: imagesByProductId.get(product.id) ?? [],
+    variants: variantsByProductId.get(product.id) ?? [],
+  }));
 }
 
 export class ProductsRepository implements ProductsRepositoryContract {
@@ -120,102 +253,36 @@ export class ProductsRepository implements ProductsRepositoryContract {
       };
     }
 
-    const productIds = products.map((product) => product.id);
-    const productsById = new Map(
-      products.map((product) => [product.id, product] as const),
-    );
-
-    const [imagesResult, variantsResult] = await Promise.all([
-      executeQuery<ProductImageRow>(
-        this.database,
-        `
-          SELECT
-            id,
-            product_id,
-            image_url,
-            display_order,
-            is_primary
-          FROM product_images
-          WHERE product_id = ANY($1::uuid[])
-          ORDER BY is_primary DESC, display_order ASC, created_at ASC
-        `,
-        [productIds],
-      ),
-      executeQuery<ProductVariantRow>(
-        this.database,
-        `
-          SELECT
-            id,
-            product_id,
-            name,
-            code,
-            override_price::TEXT,
-            stock_quantity,
-            is_active
-          FROM product_variants
-          WHERE product_id = ANY($1::uuid[])
-            AND is_active = TRUE
-          ORDER BY created_at ASC, name ASC
-        `,
-        [productIds],
-      ),
-    ]);
-
-    const imagesByProductId = new Map<string, ProductImage[]>();
-    const variantsByProductId = new Map<string, ProductVariant[]>();
-
-    for (const row of imagesResult.rows) {
-      const productImages = imagesByProductId.get(row.product_id) ?? [];
-      productImages.push({
-        id: row.id,
-        imageUrl: row.image_url,
-        displayOrder: row.display_order,
-        isPrimary: row.is_primary,
-      });
-      imagesByProductId.set(row.product_id, productImages);
-    }
-
-    for (const product of products) {
-      if (!imagesByProductId.has(product.id)) {
-        imagesByProductId.set(product.id, buildFallbackImages(product));
-      }
-    }
-
-    for (const row of variantsResult.rows) {
-      const product = productsById.get(row.product_id);
-
-      if (!product) {
-        continue;
-      }
-
-      const basePrice = Number(product.base_price);
-      const overridePrice = toMoney(row.override_price);
-      const productVariants = variantsByProductId.get(row.product_id) ?? [];
-
-      productVariants.push({
-        id: row.id,
-        name: row.name,
-        code: row.code,
-        price: overridePrice ?? basePrice,
-        overridePrice,
-        stockQuantity: row.stock_quantity,
-        isActive: row.is_active,
-      });
-
-      variantsByProductId.set(row.product_id, productVariants);
-    }
-
     return {
-      items: products.map((product) => ({
-        id: product.id,
-        title: product.title,
-        description: product.description,
-        price: Number(product.base_price),
-        imageUrl: product.image_url,
-        images: imagesByProductId.get(product.id) ?? [],
-        variants: variantsByProductId.get(product.id) ?? [],
-      })),
+      items: await hydrateProducts(this.database, products),
       totalItems,
     };
+  }
+
+  async getProductById(productId: string): Promise<ProductListItem | null> {
+    const productResult = await executeQuery<ProductRow>(
+      this.database,
+      `
+        SELECT
+          id,
+          title,
+          description,
+          base_price::TEXT,
+          image_url
+        FROM products
+        WHERE id = $1
+          AND status = 'active'
+      `,
+      [productId],
+    );
+
+    const product = productResult.rows[0];
+
+    if (!product) {
+      return null;
+    }
+
+    const [productDetails] = await hydrateProducts(this.database, [product]);
+    return productDetails ?? null;
   }
 }
