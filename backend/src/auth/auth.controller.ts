@@ -8,18 +8,13 @@ import {
   buildExpiredAccessTokenCookie,
   buildExpiredRefreshTokenCookie,
   buildRefreshTokenCookie,
-  parseCookieHeader,
+  readCookieValue,
 } from "./session.js";
 import { parseLoginInput } from "./auth.validation.js";
 import type { AuthService } from "./auth.service.js";
 
 function readRequestIpAddress(request: Request): string | null {
   return request.ip || null;
-}
-
-function readSessionId(request: Request, cookieName: string): string | null {
-  const cookies = parseCookieHeader(request.headers.cookie);
-  return cookies[cookieName] ?? null;
 }
 
 function buildAuthCookies(
@@ -175,4 +170,8 @@ export function createAuthController(
       }
     },
   };
+}
+
+function readSessionId(request: Request, cookieName: string): string | null {
+  return readCookieValue(request.headers.cookie, cookieName);
 }
