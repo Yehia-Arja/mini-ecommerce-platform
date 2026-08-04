@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router'
 
 import { LoginPage } from '../features/auth'
+import { CartPage } from '../features/cart'
 import { ProductDetailsPage } from '../features/products'
 import { fetchCurrentUserThunk } from '../features/auth/store/auth.thunks'
 import { HomePage } from '../features/home/pages/HomePage'
@@ -34,6 +35,14 @@ export function AppRouter() {
         element={
           <ProtectedRoute>
             <ProductDetailsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <ProtectedRoute>
+            <CartPage />
           </ProtectedRoute>
         }
       />

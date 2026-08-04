@@ -58,9 +58,17 @@ export function HomePage() {
               in one clean, easy-to-shop view.
             </p>
 
-            <a className="home-hero__action home-hero__action--primary" href="#featured-products">
-              Shop the selection
-            </a>
+            <div className="home-hero__actions">
+              <a
+                className="home-hero__action home-hero__action--primary"
+                href="#featured-products"
+              >
+                Shop the selection
+              </a>
+              <Link className="home-hero__action home-hero__action--secondary" to="/cart">
+                View cart
+              </Link>
+            </div>
           </div>
 
           <div className="home-hero__showcase" aria-label="Featured product showcase">
