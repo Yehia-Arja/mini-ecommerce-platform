@@ -7,6 +7,7 @@ import { errorHandler, notFoundHandler } from "./http/errors.js";
 
 type AppDependencies = {
   authRouter?: Router;
+  productsRouter?: Router;
 };
 
 export function createApp(config: AppConfig, dependencies: AppDependencies = {}) {
@@ -23,6 +24,10 @@ export function createApp(config: AppConfig, dependencies: AppDependencies = {})
 
   if (dependencies.authRouter) {
     app.use("/api/auth", dependencies.authRouter);
+  }
+
+  if (dependencies.productsRouter) {
+    app.use("/api/products", dependencies.productsRouter);
   }
 
   app.get("/api/health", (_request, response) => {

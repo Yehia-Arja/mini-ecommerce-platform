@@ -37,6 +37,14 @@ export function parseCookieHeader(
     }, {});
 }
 
+export function readCookieValue(
+  cookieHeader: string | undefined,
+  cookieName: string,
+): string | null {
+  const cookies = parseCookieHeader(cookieHeader);
+  return cookies[cookieName] ?? null;
+}
+
 export function serializeCookie(
   name: string,
   value: string,
