@@ -1,7 +1,5 @@
 # Mini E-Commerce Platform
 
-License: MIT
-
 Full-stack mini e-commerce platform built with React 19, TypeScript, Express, and PostgreSQL. The application includes cookie-based authentication, a product catalog, product details, cart management, wishlist management, and order confirmation flows.
 
 ## Features
@@ -151,4 +149,3 @@ npm run build
 npm run check
 ```
 
-I re-verified the local build path while updating this README, and `npm.cmd run build` completed successfully for both the backend and frontend.
