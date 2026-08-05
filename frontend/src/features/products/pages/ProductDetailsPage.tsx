@@ -237,15 +237,6 @@ const ProductDetailsContent = memo(function ProductDetailsContent({
               </p>
             </div>
 
-            {cartState.errorMessage ? (
-              <div
-                className="product-details__feedback product-details__feedback--error"
-                role="alert"
-              >
-                {cartState.errorMessage}
-              </div>
-            ) : null}
-
             {cartState.infoMessage ? (
               <div
                 className="product-details__feedback product-details__feedback--success"

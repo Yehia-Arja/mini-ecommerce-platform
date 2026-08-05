@@ -1,5 +1,6 @@
 import axios from 'axios'
 
+import { showToast } from '../../components/toast/toast.service'
 import { isLoginRoute, redirectToLogin } from '../../router/navigation'
 import { resetAppState } from '../../store/app.actions'
 import { store } from '../../store/store'
@@ -25,6 +26,7 @@ interface RequestOptions {
   route: string
   body?: unknown
   handleUnauthorized?: boolean
+  showErrorToast?: boolean
 }
 
 export const request = async <T = unknown>({
@@ -32,6 +34,7 @@ export const request = async <T = unknown>({
   route,
   body,
   handleUnauthorized = true,
+  showErrorToast = true,
 }: RequestOptions): Promise<T | RequestError> => {
   try {
     const response = await axios.request<T>({
@@ -51,16 +54,28 @@ export const request = async <T = unknown>({
         }
       }
 
+      const message =
+        error.response?.data?.message || error.message || 'Unknown error'
+
+      if (showErrorToast) {
+        showToast(message, 'error')
+      }
+
       return {
         error: true,
-        message:
-          error.response?.data?.message || error.message || 'Unknown error',
+        message,
       }
+    }
+
+    const message = error instanceof Error ? error.message : 'Unknown error'
+
+    if (showErrorToast) {
+      showToast(message, 'error')
     }
 
     return {
       error: true,
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message,
     }
   }
 }

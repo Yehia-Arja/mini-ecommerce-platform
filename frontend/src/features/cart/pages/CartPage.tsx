@@ -207,16 +207,9 @@ export function CartPage() {
     (state) => state.products.catalog,
   )
   const {
-    activeItemId,
-    errorMessage,
-    item: cart,
-    mutationStatus,
-    status,
+    activeItemId, errorMessage, item: cart, mutationStatus, status
   } = useAppSelector((state) => state.cart)
-  const {
-    errorMessage: orderErrorMessage,
-    placementStatus,
-  } = useAppSelector((state) => state.orders)
+  const { placementStatus } = useAppSelector((state) => state.orders)
   const [productDetailsById, setProductDetailsById] = useState<
     Record<string, ProductListItem>
   >({})
@@ -427,24 +420,6 @@ export function CartPage() {
                 </article>
               </div>
             </section>
-
-            {errorMessage ? (
-              <section className="products-status products-status--error" role="alert">
-                <div>
-                  <h2>We hit a cart issue.</h2>
-                  <p>{errorMessage}</p>
-                </div>
-              </section>
-            ) : null}
-
-            {orderErrorMessage ? (
-              <section className="products-status products-status--error" role="alert">
-                <div>
-                  <h2>We could not complete checkout.</h2>
-                  <p>{orderErrorMessage}</p>
-                </div>
-              </section>
-            ) : null}
 
             {pageState.cart.items.length ? (
               <section className="cart-layout">

@@ -177,7 +177,6 @@ export function WishlistPage() {
     mutationStatus,
     status,
   } = useAppSelector((state) => state.wishlist)
-  const cartErrorMessage = useAppSelector((state) => state.cart.errorMessage)
   const [selectedVariantsByItemId, setSelectedVariantsByItemId] = useState<
     Record<string, string | null>
   >({})
@@ -308,24 +307,6 @@ export function WishlistPage() {
                 </article>
               </div>
             </section>
-
-            {errorMessage ? (
-              <section className="products-status products-status--error" role="alert">
-                <div>
-                  <h2>We hit a wishlist issue.</h2>
-                  <p>{errorMessage}</p>
-                </div>
-              </section>
-            ) : null}
-
-            {cartErrorMessage ? (
-              <section className="products-status products-status--error" role="alert">
-                <div>
-                  <h2>We could not move that item to cart.</h2>
-                  <p>{cartErrorMessage}</p>
-                </div>
-              </section>
-            ) : null}
 
             {infoMessage ? (
               <section className="wishlist-feedback" aria-live="polite">

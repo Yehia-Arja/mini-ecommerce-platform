@@ -138,7 +138,7 @@ test("login rejects suspended users", async () => {
 
   const loginInput: LoginInput = {
     email: "yehia@example.com",
-    password: "Customer@123",
+    password: "Customer#2026",
     ipAddress: "127.0.0.1",
     userAgent: "test",
   };

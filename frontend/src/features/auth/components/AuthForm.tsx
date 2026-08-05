@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import type { ChangeEvent, FormEvent } from 'react'
 import type { ZodFormattedError } from 'zod'
 
 import { AppSpinner } from '../../../components/ui/AppSpinner'
 import { useAppDispatch, useAppSelector } from '../../../store/hooks'
 import { loginFormSchema } from '../schemas/auth.schema'
-import { clearAuthFeedback } from '../store/auth.slice'
 import { fetchCurrentUserThunk, loginThunk } from '../store/auth.thunks'
 import type {
   LoginFormErrors,
@@ -74,19 +73,11 @@ function PasswordVisibilityButton({
 
 export function AuthForm({ onSuccess }: AuthFormProps) {
   const dispatch = useAppDispatch()
-  const { errorMessage, infoMessage, status } = useAppSelector(
-    (state) => state.auth,
-  )
+  const status = useAppSelector((state) => state.auth.status)
   const [values, setValues] = useState<LoginFormValues>(initialValues)
   const [errors, setErrors] = useState<LoginFormErrors>({})
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const isFormValid = loginFormSchema.safeParse(values).success
-
-  useEffect(() => {
-    return () => {
-      dispatch(clearAuthFeedback())
-    }
-  }, [dispatch])
 
   function handleChange(event: ChangeEvent<HTMLInputElement>) {
     const { name, value } = event.target
@@ -104,10 +95,6 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
       ...current,
       [fieldName]: nextErrors[fieldName],
     }))
-
-    if (errorMessage || infoMessage) {
-      dispatch(clearAuthFeedback())
-    }
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -177,18 +164,6 @@ export function AuthForm({ onSuccess }: AuthFormProps) {
           }
           onChange={handleChange}
         />
-
-        {errorMessage ? (
-          <p className="auth-feedback auth-feedback--error" role="alert">
-            {errorMessage}
-          </p>
-        ) : null}
-
-        {infoMessage ? (
-          <p className="auth-feedback auth-feedback--info" role="status">
-            {infoMessage}
-          </p>
-        ) : null}
 
         <button
           className="auth-submit"
