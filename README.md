@@ -1,6 +1,25 @@
 # Mini E-Commerce Platform
 
-Full-stack mini e-commerce platform built with React 19, TypeScript, Express, and PostgreSQL. The application includes cookie-based authentication, a product catalog, product details, cart management, wishlist management, and order confirmation flows.
+Full-stack mini e-commerce platform built with React 19, TypeScript, Express, and PostgreSQL.
+It includes cookie-based authentication, a product catalog, cart and wishlist flows, and order confirmation backed by persisted order snapshots.
+
+## Demo
+
+### Login
+
+![Login Guide](docs/assets/login-guide.gif)
+
+### Cart
+
+![Cart Guide](docs/assets/cart-guide.gif)
+
+### Wishlist
+
+![Wishlist Guide](docs/assets/wishlist-guide.gif)
+
+### Checkout
+
+![Order Guide](docs/assets/order-guide.gif)
 
 ## Features
 
@@ -13,43 +32,44 @@ Full-stack mini e-commerce platform built with React 19, TypeScript, Express, an
 - PostgreSQL schema managed through ordered SQL migrations
 - Docker-based run path and standard local npm development path
 
+## Tech Stack
+
+- Frontend: React 19, TypeScript, Vite, Redux Toolkit, React Router, Axios, Zod
+- Backend: Node.js, Express, TypeScript
+- Database: PostgreSQL
+- Tooling: Docker Compose, ESLint, Node test runner
+
+## Architecture
+
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Backend Architecture](docs/BACKEND_ARCHITECTURE.md)
+- [Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md)
+- [Database Architecture](docs/DATABASE_ARCHITECTURE.md)
+
+### Database Diagram
+
+![Database Diagram](docs/assets/database-diagram.svg)
+
 ## Getting Started
 
-There are two supported ways to run the project.
+### Prerequisites
 
-### Option 1: Docker
+- Node.js and npm
+- PostgreSQL for the local npm path
+- Docker Desktop for the Docker path
 
-This is the fastest way to run the backend with PostgreSQL.
+### Installation
 
-1. Start Docker Desktop.
-2. From the project root, run:
-
-```bash
-docker compose up --build
-```
-
-3. The API will be available at `http://localhost:3000/api`.
-4. Run the frontend separately in another terminal:
+Install project dependencies from the repository root:
 
 ```bash
-cd frontend
 npm install
-npm run dev
+npm run install:all
 ```
 
-5. Open the app at `http://localhost:5173`.
+### Environment Variables
 
-Docker Compose provisions:
-
-- PostgreSQL on `localhost:5432`
-- the backend API on `localhost:3000`
-
-### Option 2: Local npm setup
-
-This path runs PostgreSQL locally and starts the frontend and backend directly from npm scripts.
-
-1. Install PostgreSQL locally and make sure it is running.
-2. Create a `.env` file inside `backend/` with at least:
+Create a `.env` file inside `backend/` with at least:
 
 ```env
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mini_ecommerce_platform
@@ -62,29 +82,15 @@ REFRESH_TOKEN_TTL_DAYS=30
 COOKIE_SECURE=false
 ```
 
-3. Install dependencies:
+### Run With Docker
+
+This is the fastest way to run the backend with PostgreSQL:
 
 ```bash
-npm install
-npm run install:all
+docker compose up --build
 ```
 
-4. Run database migrations:
-
-```bash
-cd backend
-npm install
-npm run db:migrate
-```
-
-5. Start the backend:
-
-```bash
-cd backend
-npm run dev
-```
-
-6. Start the frontend in another terminal:
+Then start the frontend in another terminal:
 
 ```bash
 cd frontend
@@ -92,60 +98,70 @@ npm install
 npm run dev
 ```
 
-7. Open the app at `http://localhost:5173`.
+App URLs:
 
-Notes for the local path:
+- Frontend: `http://localhost:5173`
+- Backend API: `http://localhost:3000/api`
 
-- the frontend uses `http://localhost:3000/api` by default, so `VITE_API_URL` is optional unless you want a different backend URL
-- I verified the standard build locally with `npm.cmd run build`
+### Run Frontend
 
-## Demo Account
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Run Backend
+
+For the normal local npm path, make sure PostgreSQL is already running locally.
+
+Run migrations first:
+
+```bash
+cd backend
+npm install
+npm run db:migrate
+```
+
+Then start the backend:
+
+```bash
+cd backend
+npm run dev
+```
+
+The frontend uses `http://localhost:3000/api` by default, so `VITE_API_URL` is optional unless you want a different backend URL.
+
+### Demo Account
 
 After running the migrations, you can sign in with the seeded demo user:
 
 - Email: `customer@email.com`
 - Password: `Customer#2026`
 
-## User Flow Guides
+## API
 
-### Login Guide
+Main API route groups:
 
-![Login Guide](docs/assets/login-guide.gif)
+- `/api/auth`
+- `/api/products`
+- `/api/cart`
+- `/api/wishlist`
+- `/api/orders`
+- `/api/health`
 
-### Cart Guide
+## Project Structure
 
-![Cart Guide](docs/assets/cart-guide.gif)
-
-### Wishlist Guide
-
-![Wishlist Guide](docs/assets/wishlist-guide.gif)
-
-### Order Guide
-
-![Order Guide](docs/assets/order-guide.gif)
-
-## Database Diagram
-
-![Database Diagram](docs/assets/database-diagram.svg)
-
-## Documentation
-
-The submission documents are:
-
-- [Architecture](docs/ARCHITECTURE.md)
-- [Backend Architecture](docs/BACKEND_ARCHITECTURE.md)
-- [Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md)
-- [Database Architecture](docs/DATABASE_ARCHITECTURE.md)
-- [AI Usage](docs/AI_USAGE.md)
-
-## Verification
-
-Available project scripts:
-
-```bash
-npm run lint
-npm run test
-npm run build
-npm run check
+```text
+mini-ecommerce-platform/
+|-- backend/
+|-- frontend/
+|-- docs/
+|-- Dockerfile
+|-- docker-compose.yml
+`-- package.json
 ```
 
+## Additional Documentation
+
+- [AI Usage](docs/AI_USAGE.md)
