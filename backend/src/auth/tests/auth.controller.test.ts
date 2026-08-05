@@ -88,7 +88,7 @@ test("login returns both access and refresh cookies", async () => {
       },
       body: JSON.stringify({
         email: "yehia@example.com",
-        password: "Customer@123",
+        password: "Customer#2026",
       }),
     });
 
