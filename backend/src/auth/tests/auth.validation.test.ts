@@ -7,7 +7,7 @@ test("parseLoginInput normalizes a login payload", () => {
   const input = parseLoginInput(
     {
       email: "USER@example.com",
-      password: "Customer@123",
+      password: "Customer#2026",
     },
     "127.0.0.1",
     "test-agent",
@@ -15,7 +15,7 @@ test("parseLoginInput normalizes a login payload", () => {
 
   assert.deepEqual(input, {
     email: "user@example.com",
-    password: "Customer@123",
+    password: "Customer#2026",
     ipAddress: "127.0.0.1",
     userAgent: "test-agent",
   });
