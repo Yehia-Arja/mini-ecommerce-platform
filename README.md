@@ -52,6 +52,10 @@ It includes cookie-based authentication, a product catalog, cart and wishlist fl
 
 ## Getting Started
 
+There are two supported ways to run the project:
+
+- Docker: run PostgreSQL and the backend through Docker Compose, then start the frontend locally
+- Local npm setup: run PostgreSQL locally, apply migrations, and start both apps with npm
 ### Prerequisites
 
 - Node.js and npm
@@ -82,7 +86,7 @@ REFRESH_TOKEN_TTL_DAYS=30
 COOKIE_SECURE=false
 ```
 
-### Run With Docker
+### Option 1: Run With Docker
 
 This is the fastest way to run the backend with PostgreSQL:
 
@@ -103,6 +107,10 @@ App URLs:
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:3000/api`
 
+### Option 2: Run With Local npm
+
+For the normal local npm path, make sure PostgreSQL is already running locally.
+
 ### Run Frontend
 
 ```bash
@@ -112,8 +120,6 @@ npm run dev
 ```
 
 ### Run Backend
-
-For the normal local npm path, make sure PostgreSQL is already running locally.
 
 Run migrations first:
 
@@ -162,6 +168,10 @@ mini-ecommerce-platform/
 `-- package.json
 ```
 
-## Additional Documentation
+## Documentation
 
+- [Architecture Overview](docs/ARCHITECTURE.md)
+- [Backend Architecture](docs/BACKEND_ARCHITECTURE.md)
+- [Frontend Architecture](docs/FRONTEND_ARCHITECTURE.md)
+- [Database Architecture](docs/DATABASE_ARCHITECTURE.md)
 - [AI Usage](docs/AI_USAGE.md)
